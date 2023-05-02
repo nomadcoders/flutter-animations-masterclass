@@ -29,6 +29,7 @@ class _ImplicitAnimationsScreenState extends State<ImplicitAnimationsScreen> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             AnimatedContainer(
+              curve: Curves.elasticOut,
               duration: const Duration(seconds: 2),
               width: size.width * 0.8,
               height: size.width * 0.8,
