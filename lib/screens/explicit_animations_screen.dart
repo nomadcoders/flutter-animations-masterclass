@@ -47,7 +47,7 @@ class _ExplicitAnimationsScreenState extends State<ExplicitAnimationsScreen>
   late final CurvedAnimation _curve = CurvedAnimation(
     parent: _animationController,
     curve: Curves.elasticOut,
-    reverseCurve: Curves.bounceIn,
+    reverseCurve: Curves.bounceOut,
   );
 
   void _play() {
@@ -73,6 +73,19 @@ class _ExplicitAnimationsScreenState extends State<ExplicitAnimationsScreen>
   void _onChanged(double value) {
     _range.value = 0;
     _animationController.value = value;
+  }
+
+  bool _looping = false;
+
+  void _toggleLooping() {
+    if (_looping) {
+      _animationController.stop();
+    } else {
+      _animationController.repeat(reverse: true);
+    }
+    setState(() {
+      _looping = !_looping;
+    });
   }
 
   @override
@@ -119,6 +132,12 @@ class _ExplicitAnimationsScreenState extends State<ExplicitAnimationsScreen>
                 ElevatedButton(
                   onPressed: _rewind,
                   child: const Text("Rewind"),
+                ),
+                ElevatedButton(
+                  onPressed: _toggleLooping,
+                  child: Text(
+                    _looping ? "Stop looping" : "Start looping",
+                  ),
                 )
               ],
             ),
