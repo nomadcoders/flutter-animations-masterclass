@@ -13,7 +13,6 @@ class _ExplicitAnimationsScreenState extends State<ExplicitAnimationsScreen>
   late final AnimationController _animationController = AnimationController(
     vsync: this,
     duration: const Duration(seconds: 2),
-    reverseDuration: const Duration(seconds: 1),
   )..addListener(() {
       _range.value = _animationController.value;
     });
@@ -31,7 +30,7 @@ class _ExplicitAnimationsScreenState extends State<ExplicitAnimationsScreen>
 
   late final Animation<double> _rotation = Tween(
     begin: 0.0,
-    end: 0.5,
+    end: 0.2,
   ).animate(_curve);
 
   late final Animation<double> _scale = Tween(
@@ -46,8 +45,7 @@ class _ExplicitAnimationsScreenState extends State<ExplicitAnimationsScreen>
 
   late final CurvedAnimation _curve = CurvedAnimation(
     parent: _animationController,
-    curve: Curves.elasticOut,
-    reverseCurve: Curves.bounceOut,
+    curve: Curves.elasticInOut,
   );
 
   void _play() {
