@@ -46,11 +46,13 @@ class _SwipingCardsScreenState extends State<SwipingCardsScreen>
     final bound = size.width - 200;
     final dropZone = size.width + 100;
     if (_position.value.abs() >= bound) {
-      if (_position.value.isNegative) {
-        _position.animateTo((dropZone) * -1).whenComplete(_whenComplete);
-      } else {
-        _position.animateTo(dropZone).whenComplete(_whenComplete);
-      }
+      final factor = _position.value.isNegative ? -1 : 1;
+      _position
+          .animateTo(
+            (dropZone) * factor,
+            curve: Curves.easeOut,
+          )
+          .whenComplete(_whenComplete);
     } else {
       _position.animateTo(
         0,
@@ -86,14 +88,14 @@ class _SwipingCardsScreenState extends State<SwipingCardsScreen>
             alignment: Alignment.topCenter,
             children: [
               Positioned(
-                top: 100,
+                top: 50,
                 child: Transform.scale(
-                  scale: scale,
+                  scale: min(scale, 1.0),
                   child: Card(index: _index == 5 ? 1 : _index + 1),
                 ),
               ),
               Positioned(
-                top: 100,
+                top: 50,
                 child: GestureDetector(
                   onHorizontalDragUpdate: _onHorizontalDragUpdate,
                   onHorizontalDragEnd: _onHorizontalDragEnd,
@@ -128,7 +130,7 @@ class Card extends StatelessWidget {
       clipBehavior: Clip.hardEdge,
       child: SizedBox(
         width: size.width * 0.8,
-        height: size.height * 0.5,
+        height: size.height * 0.65,
         child: Image.asset(
           "assets/covers/$index.jpg",
           fit: BoxFit.cover,
