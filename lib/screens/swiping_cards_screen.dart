@@ -35,14 +35,21 @@ class _SwipingCardsScreenState extends State<SwipingCardsScreen>
     _position.value += details.delta.dx;
   }
 
+  void _whenComplete() {
+    _position.value = 0;
+    setState(() {
+      _index = _index == 5 ? 1 : _index + 1;
+    });
+  }
+
   void _onHorizontalDragEnd(DragEndDetails details) {
     final bound = size.width - 200;
     final dropZone = size.width + 100;
     if (_position.value.abs() >= bound) {
       if (_position.value.isNegative) {
-        _position.animateTo((dropZone) * -1);
+        _position.animateTo((dropZone) * -1).whenComplete(_whenComplete);
       } else {
-        _position.animateTo(dropZone);
+        _position.animateTo(dropZone).whenComplete(_whenComplete);
       }
     } else {
       _position.animateTo(
@@ -57,6 +64,8 @@ class _SwipingCardsScreenState extends State<SwipingCardsScreen>
     _position.dispose();
     super.dispose();
   }
+
+  int _index = 1;
 
   @override
   Widget build(BuildContext context) {
@@ -80,14 +89,7 @@ class _SwipingCardsScreenState extends State<SwipingCardsScreen>
                 top: 100,
                 child: Transform.scale(
                   scale: scale,
-                  child: Material(
-                    elevation: 10,
-                    color: Colors.blue.shade100,
-                    child: SizedBox(
-                      width: size.width * 0.8,
-                      height: size.height * 0.5,
-                    ),
-                  ),
+                  child: Card(index: _index == 5 ? 1 : _index + 1),
                 ),
               ),
               Positioned(
@@ -99,14 +101,7 @@ class _SwipingCardsScreenState extends State<SwipingCardsScreen>
                     offset: Offset(_position.value, 0),
                     child: Transform.rotate(
                       angle: angle,
-                      child: Material(
-                        elevation: 10,
-                        color: Colors.red.shade100,
-                        child: SizedBox(
-                          width: size.width * 0.8,
-                          height: size.height * 0.5,
-                        ),
-                      ),
+                      child: Card(index: _index),
                     ),
                   ),
                 ),
@@ -114,6 +109,30 @@ class _SwipingCardsScreenState extends State<SwipingCardsScreen>
             ],
           );
         },
+      ),
+    );
+  }
+}
+
+class Card extends StatelessWidget {
+  final int index;
+
+  const Card({super.key, required this.index});
+
+  @override
+  Widget build(BuildContext context) {
+    final size = MediaQuery.of(context).size;
+    return Material(
+      elevation: 10,
+      borderRadius: BorderRadius.circular(10),
+      clipBehavior: Clip.hardEdge,
+      child: SizedBox(
+        width: size.width * 0.8,
+        height: size.height * 0.5,
+        child: Image.asset(
+          "assets/covers/$index.jpg",
+          fit: BoxFit.cover,
+        ),
       ),
     );
   }
