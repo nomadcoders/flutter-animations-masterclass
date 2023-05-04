@@ -26,6 +26,11 @@ class _SwipingCardsScreenState extends State<SwipingCardsScreen>
     end: 15,
   );
 
+  late final Tween<double> _scale = Tween(
+    begin: 0.8,
+    end: 1,
+  );
+
   void _onHorizontalDragUpdate(DragUpdateDetails details) {
     _position.value += details.delta.dx;
   }
@@ -67,9 +72,24 @@ class _SwipingCardsScreenState extends State<SwipingCardsScreen>
               ) *
               pi /
               180;
+          final scale = _scale.transform(_position.value.abs() / size.width);
           return Stack(
             alignment: Alignment.topCenter,
             children: [
+              Positioned(
+                top: 100,
+                child: Transform.scale(
+                  scale: scale,
+                  child: Material(
+                    elevation: 10,
+                    color: Colors.blue.shade100,
+                    child: SizedBox(
+                      width: size.width * 0.8,
+                      height: size.height * 0.5,
+                    ),
+                  ),
+                ),
+              ),
               Positioned(
                 top: 100,
                 child: GestureDetector(
