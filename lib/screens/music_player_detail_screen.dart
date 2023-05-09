@@ -27,6 +27,11 @@ class _MusicPlayerDetailScreenState extends State<MusicPlayerDetailScreen>
     ),
   );
 
+  late final Animation<Offset> _marqueeTween = Tween(
+    begin: const Offset(0.1, 0),
+    end: const Offset(-0.6, 0),
+  ).animate(_marqueeController);
+
   late final AnimationController _playPauseController = AnimationController(
     vsync: this,
     duration: const Duration(
@@ -39,10 +44,35 @@ class _MusicPlayerDetailScreenState extends State<MusicPlayerDetailScreen>
     duration: const Duration(seconds: 5),
   );
 
-  late final Animation<Offset> _marqueeTween = Tween(
-    begin: const Offset(0.1, 0),
-    end: const Offset(-0.6, 0),
-  ).animate(_marqueeController);
+  final Curve _menuCurve = Curves.easeInOutCubic;
+
+  late final Animation<double> _screenScale = Tween(
+    begin: 1.0,
+    end: 0.7,
+  ).animate(
+    CurvedAnimation(
+      parent: _menuController,
+      curve: Interval(
+        0.0,
+        0.5,
+        curve: _menuCurve,
+      ),
+    ),
+  );
+
+  late final Animation<Offset> _screenOffset = Tween(
+    begin: Offset.zero,
+    end: const Offset(0.5, 0),
+  ).animate(
+    CurvedAnimation(
+      parent: _menuController,
+      curve: Interval(
+        0.5,
+        1.0,
+        curve: _menuCurve,
+      ),
+    ),
+  );
 
   @override
   void dispose() {
@@ -173,161 +203,167 @@ class _MusicPlayerDetailScreenState extends State<MusicPlayerDetailScreen>
             ),
           ),
         ),
-        Scaffold(
-          appBar: AppBar(
-            title: const Text('Interstellar'),
-            actions: [
-              IconButton(
-                onPressed: _openMenu,
-                icon: const Icon(Icons.menu),
+        SlideTransition(
+          position: _screenOffset,
+          child: ScaleTransition(
+            scale: _screenScale,
+            child: Scaffold(
+              appBar: AppBar(
+                title: const Text('Interstellar'),
+                actions: [
+                  IconButton(
+                    onPressed: _openMenu,
+                    icon: const Icon(Icons.menu),
+                  ),
+                ],
               ),
-            ],
-          ),
-          body: Column(
-            children: [
-              const SizedBox(
-                height: 30,
-              ),
-              Align(
-                alignment: Alignment.center,
-                child: Hero(
-                  tag: "${widget.index}",
-                  child: Container(
-                    height: 350,
-                    width: 350,
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(20),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withOpacity(0.4),
-                          blurRadius: 10,
-                          spreadRadius: 2,
-                          offset: const Offset(0, 8),
+              body: Column(
+                children: [
+                  const SizedBox(
+                    height: 30,
+                  ),
+                  Align(
+                    alignment: Alignment.center,
+                    child: Hero(
+                      tag: "${widget.index}",
+                      child: Container(
+                        height: 350,
+                        width: 350,
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(20),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withOpacity(0.4),
+                              blurRadius: 10,
+                              spreadRadius: 2,
+                              offset: const Offset(0, 8),
+                            )
+                          ],
+                          image: DecorationImage(
+                            image: AssetImage(
+                              "assets/covers/${widget.index}.jpg",
+                            ),
+                            fit: BoxFit.cover,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(
+                    height: 50,
+                  ),
+                  AnimatedBuilder(
+                    animation: _progressController,
+                    builder: (context, child) => CustomPaint(
+                      size: Size(size.width - 80, 5),
+                      painter: ProgressBar(
+                        progressValue: _progressController.value,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(
+                    height: 10,
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 40),
+                    child: Row(
+                      children: const [
+                        Text(
+                          "00:00",
+                          style: TextStyle(
+                            fontSize: 12,
+                            color: Colors.grey,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                        Spacer(),
+                        Text(
+                          "01:00",
+                          style: TextStyle(
+                            fontSize: 12,
+                            color: Colors.grey,
+                            fontWeight: FontWeight.w600,
+                          ),
                         )
                       ],
-                      image: DecorationImage(
-                        image: AssetImage(
-                          "assets/covers/${widget.index}.jpg",
+                    ),
+                  ),
+                  const SizedBox(
+                    height: 20,
+                  ),
+                  const Text(
+                    "Interstellar",
+                    style: TextStyle(
+                      fontSize: 22,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                  const SizedBox(
+                    height: 5,
+                  ),
+                  SlideTransition(
+                    position: _marqueeTween,
+                    child: const Text(
+                      "A Film By Christopher Nolan - Original Motion Picture Soundtrack",
+                      maxLines: 1,
+                      overflow: TextOverflow.visible,
+                      softWrap: false,
+                      style: TextStyle(fontSize: 18),
+                    ),
+                  ),
+                  const SizedBox(
+                    height: 30,
+                  ),
+                  GestureDetector(
+                    onTap: _onPlayPauseTap,
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        AnimatedIcon(
+                          icon: AnimatedIcons.pause_play,
+                          progress: _playPauseController,
+                          size: 60,
                         ),
-                        fit: BoxFit.cover,
-                      ),
+                        // LottieBuilder.asset(
+                        //   "assets/animations/play-lottie.json",
+                        //   controller: _playPauseController,
+                        //   width: 200,
+                        //   height: 200,
+                        // )
+                      ],
                     ),
                   ),
-                ),
-              ),
-              const SizedBox(
-                height: 50,
-              ),
-              AnimatedBuilder(
-                animation: _progressController,
-                builder: (context, child) => CustomPaint(
-                  size: Size(size.width - 80, 5),
-                  painter: ProgressBar(
-                    progressValue: _progressController.value,
+                  const SizedBox(
+                    height: 30,
                   ),
-                ),
-              ),
-              const SizedBox(
-                height: 10,
-              ),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 40),
-                child: Row(
-                  children: const [
-                    Text(
-                      "00:00",
-                      style: TextStyle(
-                        fontSize: 12,
-                        color: Colors.grey,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                    Spacer(),
-                    Text(
-                      "01:00",
-                      style: TextStyle(
-                        fontSize: 12,
-                        color: Colors.grey,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    )
-                  ],
-                ),
-              ),
-              const SizedBox(
-                height: 20,
-              ),
-              const Text(
-                "Interstellar",
-                style: TextStyle(
-                  fontSize: 22,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-              const SizedBox(
-                height: 5,
-              ),
-              SlideTransition(
-                position: _marqueeTween,
-                child: const Text(
-                  "A Film By Christopher Nolan - Original Motion Picture Soundtrack",
-                  maxLines: 1,
-                  overflow: TextOverflow.visible,
-                  softWrap: false,
-                  style: TextStyle(fontSize: 18),
-                ),
-              ),
-              const SizedBox(
-                height: 30,
-              ),
-              GestureDetector(
-                onTap: _onPlayPauseTap,
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    AnimatedIcon(
-                      icon: AnimatedIcons.pause_play,
-                      progress: _playPauseController,
-                      size: 60,
-                    ),
-                    // LottieBuilder.asset(
-                    //   "assets/animations/play-lottie.json",
-                    //   controller: _playPauseController,
-                    //   width: 200,
-                    //   height: 200,
-                    // )
-                  ],
-                ),
-              ),
-              const SizedBox(
-                height: 30,
-              ),
-              GestureDetector(
-                onHorizontalDragUpdate: _onVolumeDragUpdate,
-                onHorizontalDragStart: (_) => _toggleDragging(),
-                onHorizontalDragEnd: (_) => _toggleDragging(),
-                child: AnimatedScale(
-                  scale: _dragging ? 1.1 : 1,
-                  duration: const Duration(milliseconds: 500),
-                  curve: Curves.bounceOut,
-                  child: Container(
-                    clipBehavior: Clip.hardEdge,
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                    child: ValueListenableBuilder(
-                      valueListenable: _volume,
-                      builder: (context, value, child) => CustomPaint(
-                        size: Size(size.width - 80, 50),
-                        painter: VolumePainter(
-                          volume: value,
+                  GestureDetector(
+                    onHorizontalDragUpdate: _onVolumeDragUpdate,
+                    onHorizontalDragStart: (_) => _toggleDragging(),
+                    onHorizontalDragEnd: (_) => _toggleDragging(),
+                    child: AnimatedScale(
+                      scale: _dragging ? 1.1 : 1,
+                      duration: const Duration(milliseconds: 500),
+                      curve: Curves.bounceOut,
+                      child: Container(
+                        clipBehavior: Clip.hardEdge,
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        child: ValueListenableBuilder(
+                          valueListenable: _volume,
+                          builder: (context, value, child) => CustomPaint(
+                            size: Size(size.width - 80, 50),
+                            painter: VolumePainter(
+                              volume: value,
+                            ),
+                          ),
                         ),
                       ),
                     ),
-                  ),
-                ),
-              )
-            ],
+                  )
+                ],
+              ),
+            ),
           ),
         ),
       ],
