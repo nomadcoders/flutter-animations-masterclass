@@ -6,6 +6,7 @@ import 'package:flutter_animations_masterclass/screens/explicit_animations_scree
 import 'package:flutter_animations_masterclass/screens/implicit_animations_screen.dart';
 import 'package:flutter_animations_masterclass/screens/music_player_screen.dart';
 import 'package:flutter_animations_masterclass/screens/rive_screen.dart';
+import 'package:flutter_animations_masterclass/screens/shared_axis_screen.dart';
 import 'package:flutter_animations_masterclass/screens/swiping_cards_screen.dart';
 
 class MenuScreen extends StatelessWidget {
@@ -91,6 +92,15 @@ class MenuScreen extends StatelessWidget {
                 );
               },
               child: const Text('Container Transform'),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                _goToPage(
+                  context,
+                  const SharedAxisScreen(),
+                );
+              },
+              child: const Text('Shared Axis'),
             ),
           ],
         ),
